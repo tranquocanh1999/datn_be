@@ -3,6 +3,7 @@ package com.main.Entities;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 import java.util.*;
 
@@ -23,8 +24,15 @@ public class TeacherEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
-    private List<ClassEntity> classes = new ArrayList<>();
+    @Where(clause = "delete_at is null")
+    private List<TeacherClassEntity> classes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
+    @Where(clause = "delete_at is null")
+    private List<TeacherSubjectEntity> subjects = new ArrayList<>();
+
     @Column
     private UUID createBy;
 
@@ -55,13 +63,14 @@ public class TeacherEntity {
         this.id = id;
     }
 
-    public List<ClassEntity> getClasses() {
+    public List<TeacherClassEntity> getClasses() {
         return classes;
     }
 
-    public void setClasses(List<ClassEntity> classes) {
+    public void setClasses(List<TeacherClassEntity> classes) {
         this.classes = classes;
     }
+
 
     public UserEntity getUser() {
         return user;
@@ -102,5 +111,21 @@ public class TeacherEntity {
     public void setUpdateAt(Date updateAt) {
         this.updateAt = updateAt;
     }
-    //endregion
+
+    public List<TeacherSubjectEntity> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(List<TeacherSubjectEntity> subjects) {
+        this.subjects = subjects;
+    }
+
+    public Date getDeleteAt() {
+        return deleteAt;
+    }
+
+    public void setDeleteAt(Date deleteAt) {
+        this.deleteAt = deleteAt;
+    }
+//endregion
 }

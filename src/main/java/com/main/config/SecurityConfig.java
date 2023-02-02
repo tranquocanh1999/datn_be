@@ -40,10 +40,18 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/", "/auth/**").permitAll()
-                .requestMatchers("/class", "/class/**").hasAnyAuthority("STUDENT", "ADMIN", "TEACHER")
+                .requestMatchers(
+                        "/class",
+                        "/class/**",
+                        "/subject",
+                        "/subject/**",
+                        "/question",
+                        "/question/**").hasAnyAuthority("STUDENT", "ADMIN", "TEACHER")
                 .requestMatchers(
                         "/user",
                         "/user/**",
+                        "/teacher",
+                        "/teacher/**",
                         "/student",
                         "/student/**").hasAnyAuthority("TEACHER", "ADMIN")
                 .anyRequest().authenticated()

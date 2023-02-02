@@ -31,9 +31,9 @@ public class ClassEntity {
     @Column
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "teacher_id")
-    private TeacherEntity teacher = new TeacherEntity();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "classroom", cascade = CascadeType.ALL)
+    @Where(clause = "delete_at is null")
+    private List<TeacherClassEntity> teachers = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "classroom", cascade = CascadeType.ALL)
     @Where(clause = "delete_at is null")
@@ -114,12 +114,12 @@ public class ClassEntity {
         this.description = description;
     }
 
-    public TeacherEntity getTeacher() {
-        return teacher;
+    public List<TeacherClassEntity> getTeachers() {
+        return teachers;
     }
 
-    public void setTeacher(TeacherEntity teacher) {
-        this.teacher = teacher;
+    public void setTeachers(List<TeacherClassEntity> teachers) {
+        this.teachers = teachers;
     }
 
     public UUID getCreateBy() {

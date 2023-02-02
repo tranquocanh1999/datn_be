@@ -2,12 +2,10 @@ package com.main.Services;
 
 import com.main.Entities.*;
 import com.main.Models.*;
-import com.main.Repositories.StudentClassRepository;
-import com.main.Repositories.StudentRepository;
-import com.main.Repositories.UserRepository;
-import com.main.Services.Interface.IStudentService;
-import com.main.Shared.Enums.ClassMessage;
+import com.main.Repositories.*;
+import com.main.Services.Interface.ITeachertService;
 import com.main.Shared.Enums.StudentMessage;
+import com.main.Shared.Enums.TeacherMessage;
 import com.main.Shared.Mapper.UserMapper;
 import com.main.Shared.Services.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +20,16 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
-public class StudentService implements IStudentService {
+public class TeacherService implements ITeachertService {
     @Autowired
-    StudentRepository studentRepository;
+    TeacherRepository teacherRepository;
+
     @Autowired
-    StudentClassRepository studentClassRepository;
+    TeacherClassRepository teacherClassRepository;
+
+    @Autowired
+    TeacherSubjectRepository teacherSubjectRepository;
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -37,12 +40,13 @@ public class StudentService implements IStudentService {
 
 
     @Override
-    public PageModal<Student> findMany(Search data) {
+    public PageModal<Teacher> findMany(Search data) {
         Pageable pageRequest = commonService.getPage(data);
 
         final String[] username = {""};
         final String[] fullName = {""};
         final String[] classID = {""};
+        final String[] subjectID = {""};
         if (data.getFilters().stream().count() > 0) {
             data.getFilters().stream().forEach(item -> {
                 if (item.getName().equals("username")) {
@@ -51,72 +55,88 @@ public class StudentService implements IStudentService {
                     fullName[0] = item.getValue();
                 } else if (item.getName().equals("classID")) {
                     classID[0] = item.getValue();
+                } else if (item.getName().equals("subjectID")) {
+                    subjectID[0] = item.getValue();
                 }
             });
         }
-        Page<StudentEntity> page;
-        if (classID[0].equals("")) {
-            page = studentRepository.findAllByUserFullNameContainsAndUserUsernameContainsAndDeleteAtIsNull(
+        Page<TeacherEntity> page;
+        if (classID[0].equals("") && subjectID[0].equals("")) {
+            page = teacherRepository.findAllByUserFullNameContainsAndUserUsernameContainsAndDeleteAtIsNull(
                     fullName[0], username[0], pageRequest
             );
-        } else {
-            page = studentRepository.findAllByUserFullNameContainsAndUserUsernameContainsAndClassesClassroomIdAndDeleteAtIsNull(
+        } else if (classID[0].equals("")) {
+            page = teacherRepository.findAllByUserFullNameContainsAndUserUsernameContainsAndSubjectsSubjectIdAndDeleteAtIsNull(
+                    fullName[0], username[0], Long.parseLong(subjectID[0]), pageRequest
+            );
+        } else if (subjectID[0].equals("")) {
+            page = teacherRepository.findAllByUserFullNameContainsAndUserUsernameContainsAndClassesClassroomIdAndDeleteAtIsNull(
                     fullName[0], username[0], UUID.fromString(classID[0]), pageRequest
             );
+        } else {
+            page = teacherRepository.findAllByUserFullNameContainsAndUserUsernameContainsAndClassesClassroomIdAndSubjectsSubjectIdAndDeleteAtIsNull(
+                    fullName[0], username[0], UUID.fromString(classID[0]), Long.parseLong(subjectID[0]), pageRequest
+            );
         }
-        List<Student> studentList = userMapper.getListStudent(page.getContent());
-        PageModal<Student> result = new PageModal<>(page, studentList);
-
-
+        List<Teacher> teacherList = userMapper.getListTeacher(page.getContent());
+        PageModal<Teacher> result = new PageModal<>(page, teacherList);
         return result;
     }
 
     @Override
-    public StudentEntity delete(UUID id) {
-        StudentEntity entity = studentRepository.findByIdAndDeleteAtIsNull(id);
+    public TeacherEntity delete(UUID id) {
+        TeacherEntity entity = teacherRepository.findByIdAndDeleteAtIsNull(id);
         entity.setDeleteAt(new Date());
-        studentRepository.save(entity);
+        teacherRepository.save(entity);
         UserEntity user= entity.getUser();
         user.setDeleteAt(new Date());
         userRepository.save(user);
-        List<StudentClassEntity> studentClassEntities = studentClassRepository.getAllByStudentIdAndDeleteAtIsNull(id);
-
-        for (StudentClassEntity studentClassEntity : studentClassEntities) {
-            studentClassEntity.setDeleteAt(new Date());
+        List<TeacherClassEntity> teacherClassEntities = teacherClassRepository.getAllByTeacherIdAndDeleteAtIsNull(id);
+        for (TeacherClassEntity teacherClassEntity : teacherClassEntities) {
+            teacherClassEntity.setDeleteAt(new Date());
         }
+        teacherClassRepository.saveAll(teacherClassEntities);
 
-        studentClassRepository.saveAll(studentClassEntities);
+        List<TeacherSubjectEntity> teacherSubjectEntities = teacherSubjectRepository.getAllByTeacherIdAndDeleteAtIsNull(id);
+        for (TeacherSubjectEntity teacherSubjectEntity : teacherSubjectEntities) {
+            teacherSubjectEntity.setDeleteAt(new Date());
+        }
+        teacherSubjectRepository.saveAll(teacherSubjectEntities);
         return null;
     }
 
     @Override
-    public Student getStudent(UUID id) {
-        StudentEntity result = studentRepository.findByIdAndDeleteAtIsNull(id);
+    public Teacher getTeacher(UUID id) {
+        TeacherEntity result = teacherRepository.findByIdAndDeleteAtIsNull(id);
         result.getUser();
-        return new Student(result);
+        return new Teacher(result);
     }
 
     @Override
-    public Message createStudent(Student data) throws CommonException {
+    public Message createTeacher(Teacher data) throws CommonException {
         Message message = validate(data, false);
         if (message == null) {
             UserEntity user = new UserEntity(data);
-            RoleEntity role = new RoleEntity();
-            role.setId((long) 2);
-            user.setRole(role);
             user.setPassword(commonService.encryptPass(user.getPassword()));
-            StudentEntity student = new StudentEntity();
-            student.setCreateAt(new Date());
-            student.setCreateBy(userRepository.findByUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
+            TeacherEntity teacher = new TeacherEntity();
+            teacher.setCreateAt(new Date());
+            teacher.setCreateBy(userRepository.findByUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
             );
-            student.setUser(userRepository.save(user));
-            StudentEntity studentEntity = studentRepository.save(student);
+            teacher.setUser(userRepository.save(user));
+            TeacherEntity teacherEntity = teacherRepository.save(teacher);
             data.getClasses().forEach(item -> {
                 ClassEntity classEntity = new ClassEntity(item.getId());
-                StudentClassEntity studentClassEntity = new StudentClassEntity();
-                studentClassEntity.setStudent(studentEntity);
-                studentClassEntity.setClassroom(classEntity);
-                studentClassRepository.save(studentClassEntity);
+                TeacherClassEntity teacherClassEntity = new TeacherClassEntity();
+                teacherClassEntity.setTeacher(teacherEntity);
+                teacherClassEntity.setClassroom(classEntity);
+                teacherClassRepository.save(teacherClassEntity);
+            });
+            data.getSubjects().forEach(item -> {
+                SubjectEntity subjectEntity = new SubjectEntity(item.getId());
+                TeacherSubjectEntity  teacherSubjectEntity = new TeacherSubjectEntity();
+                teacherSubjectEntity.setTeacher(teacherEntity);
+                teacherSubjectEntity.setSubject(subjectEntity);
+                teacherSubjectRepository.save(teacherSubjectEntity);
             });
         } else {
             throw new CommonException(message);
@@ -124,12 +144,12 @@ public class StudentService implements IStudentService {
         message = new Message();
         message.setStatus(200);
         message.setMgsCode("CREATE_SUCCESS");
-        message.setMessage(ClassMessage.CREATE_SUCCESS.value());
+        message.setMessage(TeacherMessage.CREATE_SUCCESS.value());
         return message;
     }
 
     @Override
-    public Message updateStudent(Student data) throws CommonException {
+    public Message updateTeacher(Teacher data) throws CommonException {
         UserEntity userEntity = userRepository.findByUsernameAndDeleteAtIsNull(data.getUsername());
         userEntity.getId();
         Message message = validate(data, true);
@@ -141,26 +161,39 @@ public class StudentService implements IStudentService {
             } else {
                 user.setPassword(userEntity.getPassword());
             }
-            user.setRole(userEntity.getRole());
             userRepository.save(user);
-            StudentEntity student = studentRepository.findByIdAndDeleteAtIsNull(data.getId());
-            student.setUpdateAt(new Date());
-            student.setUpdateBy(userRepository.findByUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
+            TeacherEntity teacher = teacherRepository.findByIdAndDeleteAtIsNull(data.getId());
+            teacher.setUpdateAt(new Date());
+            teacher.setUpdateBy(userRepository.findByUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
             );
-            studentRepository.save(student);
-            List<StudentClassEntity> studentClassEntities = studentClassRepository.getAllByStudentIdAndDeleteAtIsNull(student.getId());
+            teacherRepository.save(teacher);
+            List<TeacherClassEntity> teacherClassEntities = teacherClassRepository.getAllByTeacherIdAndDeleteAtIsNull(teacher.getId());
 
-            for (StudentClassEntity studentClassEntity : studentClassEntities) {
-                studentClassEntity.setDeleteAt(new Date());
+            for (TeacherClassEntity teacherClassEntity : teacherClassEntities) {
+                teacherClassEntity.setDeleteAt(new Date());
             }
 
-            studentClassRepository.saveAll(studentClassEntities);
+            teacherClassRepository.saveAll(teacherClassEntities);
+
+            List<TeacherSubjectEntity> teacherSubjectEntities = teacherSubjectRepository.getAllByTeacherIdAndDeleteAtIsNull(teacher.getId());
+            for (TeacherSubjectEntity teacherSubjectEntity : teacherSubjectEntities) {
+                teacherSubjectEntity.setDeleteAt(new Date());
+            }
+            teacherSubjectRepository.saveAll(teacherSubjectEntities);
+
             data.getClasses().forEach(item -> {
                 ClassEntity classEntity = new ClassEntity(item.getId());
-                StudentClassEntity studentClassEntity = new StudentClassEntity();
-                studentClassEntity.setStudent(student);
-                studentClassEntity.setClassroom(classEntity);
-                studentClassRepository.save(studentClassEntity);
+                TeacherClassEntity teacherClassEntity = new TeacherClassEntity();
+                teacherClassEntity.setTeacher(teacher);
+                teacherClassEntity.setClassroom(classEntity);
+                teacherClassRepository.save(teacherClassEntity);
+            });
+            data.getSubjects().forEach(item -> {
+                SubjectEntity subjectEntity = new SubjectEntity(item.getId());
+                TeacherSubjectEntity  teacherSubjectEntity = new TeacherSubjectEntity();
+                teacherSubjectEntity.setTeacher(teacher);
+                teacherSubjectEntity.setSubject(subjectEntity);
+                teacherSubjectRepository.save(teacherSubjectEntity);
             });
         } else {
             throw new CommonException(message);
@@ -168,7 +201,7 @@ public class StudentService implements IStudentService {
         return message;
     }
 
-    private Message validate(Student data, Boolean isEdit) {
+    private Message validate(Teacher data, Boolean isEdit) {
         Pattern patternMail = Pattern.compile("^[a-zA-Z0-9\\+\\.\\_%\\-]{1,256}@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,62}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+$");
         Message message = new Message();
         message.setStatus(400);
@@ -207,12 +240,12 @@ public class StudentService implements IStudentService {
             message.setMessage(StudentMessage.PASSWORD_MIN_LENGTH.value());
         }
         UserEntity user = userRepository.findByUsername(data.getUsername());
-        StudentEntity student = studentRepository.findByIdAndDeleteAtIsNull(data.getId());
-        if (user != null && (student==null||!user.getId().equals(student.getUser().getId()))) {
+        TeacherEntity teacher = teacherRepository.findByIdAndDeleteAtIsNull(data.getId());
+        if (user != null &&  (teacher==null||!user.getId().equals(teacher.getUser().getId()))) {
             message.setMgsCode("USERNAME_IS_USED");
             message.setMessage(StudentMessage.USERNAME_IS_USED.value());
         }
-        System.out.println(message.getMessage() == null);
+
         if (message.getMessage() == null) {
             return null;
         } else return message;

@@ -1,12 +1,12 @@
 package com.main.Controllers;
 
-import com.main.Entities.ClassEntity;
+import com.main.Entities.QuestionEntity;
 import com.main.Models.CommonException;
 import com.main.Models.Message;
 import com.main.Models.Search;
-import com.main.Models.Student;
-import com.main.Services.Interface.IStudentService;
-import com.main.Shared.Enums.ClassMessage;
+import com.main.Models.Teacher;
+import com.main.Services.Interface.IQuestionService;
+import com.main.Services.Interface.ITeachertService;
 import com.main.Shared.Enums.CommonMessage;
 import com.main.Shared.Enums.StudentMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,21 +17,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 
-
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/question")
 
-public class StudentController {
+public class QuestionController {
     @Autowired
-    private IStudentService studentService;
+    private IQuestionService questionService;
 
     @PostMapping("/list")
-    public ResponseEntity getStudents(@RequestBody Search data) throws Exception {
+    public ResponseEntity getQuestions(@RequestBody Search data) throws Exception {
         Message message;
         try {
-            return ResponseEntity.ok(studentService.findMany(data));
+            return ResponseEntity.ok(questionService.findMany(data));
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -45,7 +43,7 @@ public class StudentController {
     public ResponseEntity delete(@PathVariable UUID id) throws Exception {
         Message message;
         try {
-            studentService.delete(id);
+            questionService.delete(id);
             message = new Message(
                     "DELETE_SUCCESS",
                     StudentMessage.DELETE_SUCCESS.value(),
@@ -70,7 +68,7 @@ public class StudentController {
     public ResponseEntity getStudent(@PathVariable UUID id) throws Exception {
         Message message;
         try {
-            return ResponseEntity.ok(studentService.getStudent(id));
+            return ResponseEntity.ok(questionService.getQuestion(id));
         } catch (NullPointerException e) {
             message = new Message(
                     "STUDENT_NOT_EXIST",
@@ -87,10 +85,10 @@ public class StudentController {
     }
 
     @PostMapping("")
-    public ResponseEntity createStudent(@RequestBody Student data) throws Exception {
+    public ResponseEntity createQuestion(@RequestBody QuestionEntity data) throws Exception {
         Message message;
         try {
-            return ResponseEntity.ok(studentService.createStudent(data));
+            return ResponseEntity.ok(questionService.createQuestion(data));
         } catch (CommonException e) {
             message = e.getData();
         } catch (Exception e) {
@@ -105,11 +103,11 @@ public class StudentController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity updateStudent(@RequestBody Student data, @PathVariable UUID id) throws Exception {
+    public ResponseEntity updateQuestion(@RequestBody QuestionEntity data, @PathVariable UUID id) throws Exception {
         Message message ;
         try {
             data.setId(id);
-            return ResponseEntity.ok(studentService.updateStudent(data));
+            return ResponseEntity.ok(questionService.updateQuestion(data));
         } catch (CommonException e) {
             message = e.getData();
         }  catch (NullPointerException e) {
@@ -118,7 +116,6 @@ public class StudentController {
                     StudentMessage.STUDENT_NOT_EXIST.value(),
                     400);
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),

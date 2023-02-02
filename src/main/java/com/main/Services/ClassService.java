@@ -1,7 +1,6 @@
 package com.main.Services;
 
 import com.main.Entities.ClassEntity;
-import com.main.Entities.StudentEntity;
 import com.main.Models.*;
 import com.main.Repositories.ClassRepository;
 import com.main.Repositories.TeacherRepository;
@@ -91,8 +90,7 @@ public class ClassService implements IClassService {
                 data.setClassCode(classCode);
             } else data.setClassCode("LH_1");
             data.setCreateAt(new Date());
-            data.setTeacher(null);
-            data.setCreateBy(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
+            data.setCreateBy(userRepository.findByUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
             );
             classRepository.save(data);
         } else {
@@ -116,7 +114,7 @@ public class ClassService implements IClassService {
         }
         if (message == null) {
             classEntity.setUpdateAt(new Date());
-            classEntity.setUpdateBy(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
+            classEntity.setUpdateBy(userRepository.findByUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()).getId()
             );
             classEntity.setClassName(data.getClassName());
             classEntity.setDescription(data.getDescription());

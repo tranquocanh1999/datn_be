@@ -6,28 +6,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "role",indexes = @Index(columnList = "id"))
-public class RoleEntity {
+@Table(name = "subject", indexes = @Index(columnList = "id"))
+public class SubjectEntity {
     //region Property
     @Id
     private Long id;
     private String name;
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 
     @Column
     private UUID createBy;
@@ -44,11 +28,29 @@ public class RoleEntity {
     //endregion
     //region Constructor
 
-    public RoleEntity() {
+    public SubjectEntity(Long id) {
+        this.id = id;
+    }
+
+    public SubjectEntity() {
     }
 
     //endregion
     //region Getter & Setter
-    //endregion
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    //endregion
 }

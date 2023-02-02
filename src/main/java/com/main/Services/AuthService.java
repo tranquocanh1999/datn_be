@@ -36,7 +36,7 @@ public class AuthService implements IAuthService {
 
     public Token Login(String username, String password) {
 
-        UserEntity user = userRepository.findByUsernameAndPassword(username, commonService.encryptPass(password));
+        UserEntity user = userRepository.findByUsernameAndPasswordAndDeleteAtIsNull(username, commonService.encryptPass(password));
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword()
                 , true, true, true,
                 true, getAuthorities(user.getRole()));
@@ -93,7 +93,7 @@ public class AuthService implements IAuthService {
     }
 
     public UserDetails LoadUserByUsername(String username) {
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByUsernameAndDeleteAtIsNull(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);

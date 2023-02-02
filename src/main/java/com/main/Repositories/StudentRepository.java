@@ -15,7 +15,6 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
     Page<StudentEntity> findAllByUserFullNameContainsAndUserUsernameContainsAndClassesClassroomIdAndDeleteAtIsNull(String fullName, String username, UUID classID, Pageable pageable);
 
     Page<StudentEntity> findAllByUserFullNameContainsAndUserUsernameContainsAndDeleteAtIsNull(String fullName, String username, Pageable pageable);
-
     StudentEntity findByIdAndDeleteAtIsNull(UUID id);
     StudentEntity findById(UUID id);
 }

@@ -18,7 +18,7 @@ public class ClassModel {
     private String description;
 
 
-    private Teacher teacher;
+    private Integer numberOfTeacher;
 
     private Integer numberOfStudent;
 
@@ -31,7 +31,7 @@ public class ClassModel {
         this.classCode = classEntity.getClassCode();
         this.className = classEntity.getClassName();
         this.description = classEntity.getDescription();
-        this.teacher= new Teacher(classEntity.getTeacher());
+        this.numberOfTeacher= classEntity.getTeachers().size();
         this.numberOfStudent=classEntity.getStudents().size();
     }
 
@@ -72,12 +72,12 @@ public class ClassModel {
         this.description = description;
     }
 
-    public Teacher getTeacher() {
-        return teacher;
+    public Integer getNumberOfTeacher() {
+        return numberOfTeacher;
     }
 
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
+    public void setNumberOfTeacher(Integer numberOfTeacher) {
+        this.numberOfTeacher = numberOfTeacher;
     }
 
     public Integer getNumberOfStudent() {

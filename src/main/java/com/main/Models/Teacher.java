@@ -2,6 +2,8 @@ package com.main.Models;
 
 import com.main.Entities.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,25 +17,36 @@ public class Teacher {
     private RoleEntity role;
     private String email;
     private String phoneNumber;
-    private Date birthday;
+    private String birthday;
     private Integer gender;
-    private List<ClassEntity> classes = new ArrayList<>();
+
+    private String password;
+    private List<ClassModel2> classes = new ArrayList<>();
+    private List<SubjectEntity> subjects = new ArrayList<>();
     //endregion
 
     //region Constructor
 
     public Teacher(TeacherEntity teacher) {
-        if(teacher!=null){
-        UserEntity user = teacher.getUser();
-        this.username = user.getUsername();
-        this.id = user.getId();
-        this.role = user.getRole();
-        this.fullName = user.getFullName();
-        this.birthday = user.getBirthday();
-        this.role = user.getRole();
-        this.email = user.getEmail();
-        this.gender = user.getGender();
-        this.phoneNumber = user.getPhoneNumber();}
+        if (teacher != null) {
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            UserEntity user = teacher.getUser();
+            this.username = user.getUsername();
+            this.id = teacher.getId();
+            this.role = user.getRole();
+            this.fullName = user.getFullName();
+            this.birthday = dateFormat.format(user.getBirthday());
+            this.role = user.getRole();
+            this.email = user.getEmail();
+            this.gender = user.getGender();
+            this.phoneNumber = user.getPhoneNumber();
+            teacher.getClasses().forEach(item->{
+                this.classes.add(new ClassModel2(item.getClassroom()));
+            });
+            teacher.getSubjects().forEach(item -> this.subjects.add(item.getSubject()));
+        }
+    }
+    public Teacher() {
     }
 
     //endregion
@@ -87,11 +100,11 @@ public class Teacher {
         this.phoneNumber = phoneNumber;
     }
 
-    public Date getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 
@@ -103,14 +116,29 @@ public class Teacher {
         this.gender = gender;
     }
 
-    public List<ClassEntity> getClasses() {
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<ClassModel2> getClasses() {
         return classes;
     }
 
-    public void setClasses(List<ClassEntity> classes) {
+    public void setClasses(List<ClassModel2> classes) {
         this.classes = classes;
     }
 
+    public List<SubjectEntity> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(List<SubjectEntity> subjects) {
+        this.subjects = subjects;
+    }
 
     //endregion
 }

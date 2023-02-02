@@ -3,7 +3,6 @@ package com.main.Entities;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Where;
 
 import java.util.Date;
 
@@ -11,16 +10,17 @@ import java.util.Date;
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id")
-@Table(name = "student_class",indexes = @Index(columnList = "id"))
-public class StudentClassEntity {
+@Table(name = "teacher_class",indexes = @Index(columnList = "id"))
+
+public class TeacherClassEntity {
     //region Property
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "student_id")
-    StudentEntity student;
+    @JoinColumn(name = "teacher_id")
+    TeacherEntity teacher;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "class_id")
@@ -41,12 +41,15 @@ public class StudentClassEntity {
     public void setId(Long id) {
         this.id = id;
     }
-    public StudentEntity getStudent() {
-        return student;
+
+    public TeacherEntity getTeacher() {
+        return teacher;
     }
-    public void setStudent(StudentEntity student) {
-        this.student = student;
+
+    public void setTeacher(TeacherEntity teacher) {
+        this.teacher = teacher;
     }
+
     public ClassEntity getClassroom() {
         return classroom;
     }

@@ -1,6 +1,7 @@
 package com.main.Entities;
 
 import com.main.Models.Student;
+import com.main.Models.Teacher;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.UuidGenerator;
@@ -42,6 +43,9 @@ public class UserEntity implements Serializable {
     private Date birthday;
     private Integer gender;
 
+    @Column
+    private Date deleteAt;
+
     //endregion
 
     //region Constructor
@@ -60,6 +64,23 @@ public class UserEntity implements Serializable {
         }
         this.gender = student.getGender();
     }
+
+    public UserEntity(Teacher teacher) {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        this.username = teacher.getUsername();
+        this.password = teacher.getPassword();
+        this.fullName = teacher.getFullName();
+        this.email = teacher.getEmail();
+        this.phoneNumber = teacher.getPhoneNumber();
+        try {
+            this.birthday = dateFormat.parse(teacher.getBirthday());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        this.role=teacher.getRole();
+        this.gender = teacher.getGender();
+    }
+
 
     public UserEntity() {
     }
@@ -144,5 +165,14 @@ public class UserEntity implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Date getDeleteAt() {
+        return deleteAt;
+    }
+
+    public void setDeleteAt(Date deleteAt) {
+        this.deleteAt = deleteAt;
+    }
+
     //endregion
 }
