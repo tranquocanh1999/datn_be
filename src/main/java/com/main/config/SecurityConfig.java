@@ -46,7 +46,9 @@ public class SecurityConfig {
                         "/subject",
                         "/subject/**",
                         "/question",
-                        "/question/**").hasAnyAuthority("STUDENT", "ADMIN", "TEACHER")
+                        "/question/**",
+                        "/competition",
+                        "/competition/**").hasAnyAuthority("STUDENT", "ADMIN", "TEACHER")
                 .requestMatchers(
                         "/user",
                         "/user/**",

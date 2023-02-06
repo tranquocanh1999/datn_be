@@ -2,9 +2,7 @@ package com.main.Services;
 
 
 import com.main.Entities.*;
-import com.main.Models.CommonException;
-import com.main.Models.Message;
-import com.main.Models.Token;
+import com.main.Models.*;
 import com.main.Repositories.*;
 import com.main.Services.Interface.IAuthService;
 import com.main.Shared.Enums.CommonMessage;
@@ -32,6 +30,10 @@ public class AuthService implements IAuthService {
 
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private TeacherRepository teacherRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
 
     public Token Login(String username, String password) {
@@ -102,6 +104,16 @@ public class AuthService implements IAuthService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword()
                 , true, true, true,
                 true, getAuthorities(user.getRole()));
+    }
+
+    @Override
+    public Teacher LoadTeacherByUsername(String username) {
+        return new Teacher(teacherRepository.findByUserUsernameAndDeleteAtIsNull(username));
+    }
+
+    @Override
+    public Student LoadStudentByUsername(String username) {
+        return new Student(studentRepository.findByUserUsernameAndDeleteAtIsNull(username));
     }
 
 

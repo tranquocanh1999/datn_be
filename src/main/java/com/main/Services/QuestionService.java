@@ -158,8 +158,6 @@ public class QuestionService implements IQuestionService {
         if (message.getMessage() == null) {
             return null;
         } else return message;
-
-
     }
 
 }

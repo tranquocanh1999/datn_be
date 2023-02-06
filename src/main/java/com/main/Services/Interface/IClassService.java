@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public interface IClassService {
     PageModal<ClassModel> findMany(Search data);
+    List<ClassModel2> getAllByStudent();
     ClassEntity delete(UUID id);
     ClassModel getClass(UUID id);
     Message createClass(ClassEntity data) throws CommonException;

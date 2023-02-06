@@ -60,6 +60,12 @@ public class ClassService implements IClassService {
     }
 
     @Override
+    public List<ClassModel2> getAllByStudent() {
+        List<ClassEntity> classEntities=classRepository.findAllByStudentsStudentUserUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName());
+        return classMapper.getListClass2(classEntities);
+    }
+
+    @Override
     public List<ClassModel2> getAll() {
         List<ClassEntity> classEntities=classRepository.findAllByDeleteAtIsNull();
         return classMapper.getListClass2(classEntities);

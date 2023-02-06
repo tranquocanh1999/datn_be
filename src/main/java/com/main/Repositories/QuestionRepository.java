@@ -14,11 +14,16 @@ import java.util.UUID;
 @Repository
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> {
     Page<QuestionEntity> findAllByDeleteAtIsNull(Pageable pageable);
-    Page<QuestionEntity> findAllBySubjectIdAndDeleteAtIsNull(Long id,Pageable pageable);
-    Page<QuestionEntity> findAllByLevelAndDeleteAtIsNull(Integer level,Pageable pageable);
-    Page<QuestionEntity> findAllBySubjectIdAndLevelAndDeleteAtIsNull(Long id,Integer level,Pageable pageable);
+
+    Page<QuestionEntity> findAllBySubjectIdAndDeleteAtIsNull(Long id, Pageable pageable);
+
+    Page<QuestionEntity> findAllByLevelAndDeleteAtIsNull(Integer level, Pageable pageable);
+
+    Page<QuestionEntity> findAllBySubjectIdAndLevelAndDeleteAtIsNull(Long id, Integer level, Pageable pageable);
+
     QuestionEntity findByIdAndDeleteAtIsNull(UUID id);
 
+    Integer countAllByLevelAndDeleteAtIsNull(Integer Level);
     @Query(value = "SELECT code FROM datn_db.question order by create_at desc limit 0,1", nativeQuery = true)
     String getQuestionCode();
 

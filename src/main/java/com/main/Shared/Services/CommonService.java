@@ -9,7 +9,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.awt.print.Pageable;
+import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class CommonService {
@@ -38,5 +40,12 @@ public class CommonService {
 
     public String encryptPass(String pass)  {
        return DigestUtils.sha256Hex(pass);
+    }
+
+    public UUID convertBytesToUUID(byte[] bytes) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        long high = byteBuffer.getLong();
+        long low = byteBuffer.getLong();
+        return new UUID(high, low);
     }
 }

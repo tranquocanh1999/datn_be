@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -32,6 +33,30 @@ public class AuthController {
                     400);
             return new ResponseEntity<Object>(
                     message, new HttpHeaders(), message.getStatus());
+        }
+
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity getUser() throws Exception {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        try {
+
+            Teacher teacher = authService.LoadTeacherByUsername(username);
+            if (teacher.getId() != null) {
+                return ResponseEntity.ok(teacher);
+            }
+            Student student = authService.LoadStudentByUsername(username);
+            return ResponseEntity.ok(student);
+        } catch (NullPointerException e) {
+
+            Message message = new Message(
+                    "LOGIN_FAILED",
+                    CommonMessage.LOGIN_FAILED.value(),
+                    400);
+            return new ResponseEntity<Object>(
+                    message, new HttpHeaders(), message.getStatus());
+
         }
 
     }

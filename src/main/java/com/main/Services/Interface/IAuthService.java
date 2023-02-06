@@ -1,6 +1,8 @@
 package com.main.Services.Interface;
 
 import com.main.Models.CommonException;
+import com.main.Models.Student;
+import com.main.Models.Teacher;
 import com.main.Models.Token;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,5 +13,8 @@ public interface IAuthService {
     Void Logout(UUID tokenID) throws CommonException;
     Token GetToken(String refreshToken) throws CommonException;
     UserDetails LoadUserByUsername(String username);
+    Teacher LoadTeacherByUsername(String username);
+
+    Student LoadStudentByUsername(String username);
 
 }

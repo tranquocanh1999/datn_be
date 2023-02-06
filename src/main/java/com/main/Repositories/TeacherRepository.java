@@ -18,5 +18,6 @@ public interface TeacherRepository extends JpaRepository<TeacherEntity, Long> {
 
     Page<TeacherEntity> findAllByUserFullNameContainsAndUserUsernameContainsAndDeleteAtIsNull(String fullName, String username, Pageable pageable);
     TeacherEntity findByIdAndDeleteAtIsNull(UUID id);
+    TeacherEntity findByUserUsernameAndDeleteAtIsNull(String username);
     TeacherEntity findById(UUID id);
 }

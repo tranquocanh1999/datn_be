@@ -23,4 +23,5 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
 
 
     List<ClassEntity> findAllByDeleteAtIsNull();
+    List<ClassEntity> findAllByStudentsStudentUserUsernameAndDeleteAtIsNull(String username);
 }
