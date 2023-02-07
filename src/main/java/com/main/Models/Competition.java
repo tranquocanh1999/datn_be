@@ -18,7 +18,7 @@ public class Competition {
     private ClassModel2 classroom ;
     private Integer time;
     private Integer status;
-    private Integer degree;
+    private Double degree;
     //endregion
 
     //region Constructor
@@ -96,11 +96,11 @@ public class Competition {
         this.status = status;
     }
 
-    public Integer getDegree() {
+    public Double getDegree() {
         return degree;
     }
 
-    public void setDegree(Integer degree) {
+    public void setDegree(Double degree) {
         this.degree = degree;
     }
 //endregion

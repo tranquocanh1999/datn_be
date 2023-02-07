@@ -7,7 +7,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.*;
 
 @Entity
-@Table(name = "user_exam", indexes = @Index(columnList = "id"))
+@Table(name = "student_exam", indexes = @Index(columnList = "id"))
 public class StudentExamEntity {
     //region Property
     @Id
@@ -27,10 +27,10 @@ public class StudentExamEntity {
 
     @ManyToOne
     @JoinColumn(name = "student_id")
-    private StudentEntity student ;
+    private StudentEntity student;
 
     @Column
-    private Long degree;
+    private double degree = 0;
 
     @Column
     private Integer status;
@@ -39,9 +39,10 @@ public class StudentExamEntity {
     private Date startAt;
 
     @ElementCollection
-    @JoinTable(name = "student_answer", joinColumns = @JoinColumn(name = "student_answer_id"))
+    @CollectionTable(name="student_answer")
+    @MapKeyJoinColumn(name="student_answer_id")
     @Column(name = "student_answers")
-    private Map<UUID,Integer> answers= new HashMap<>();
+    private Map<UUID, Integer> answers = new HashMap<>();
 
     @Column
     private UUID createBy;
@@ -94,11 +95,11 @@ public class StudentExamEntity {
         this.student = student;
     }
 
-    public Long getDegree() {
+    public double getDegree() {
         return degree;
     }
 
-    public void setDegree(Long degree) {
+    public void setDegree(double degree) {
         this.degree = degree;
     }
 

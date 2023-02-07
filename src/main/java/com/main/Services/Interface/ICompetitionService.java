@@ -7,6 +7,7 @@ import com.main.Entities.StudentExamEntity;
 import com.main.Models.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ICompetitionService {
@@ -15,6 +16,11 @@ public interface ICompetitionService {
     CompetitionEntity delete(UUID id) throws CommonException;
     Competition get(UUID id);
     Message create(ExamForm data) throws CommonException;
+
+    double submitExam(UUID id, Map<UUID,Integer> results) ;
+    List<StudentExam>  getStudents(UUID id);
+
+
     CompetitionEntity changeStatus(UUID id, Integer status) throws CommonException;
     StudentExamEntity startExam(UUID id);
     List<ExamEntity> getExams(UUID id);

@@ -11,11 +11,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user-exam")
-public class UerExamController {
+@RequestMapping("/student-exam")
+public class StudentExamController {
     @Autowired
     IClassService classService;
 
@@ -65,6 +66,7 @@ public class UerExamController {
                     CompetitionMessage.COMPETITION_NOT_EXIST.value(),
                     400);
         } catch (Exception e) {
+
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -86,6 +88,47 @@ public class UerExamController {
                     400);
         } catch (Exception e) {
             System.out.println(e);
+            message = new Message(
+                    "SERVER_ERROR",
+                    CommonMessage.SERVER_ERROR.value(),
+                    500);
+        }
+        return new ResponseEntity<Object>(
+                message, new HttpHeaders(), message.getStatus());
+    }
+
+    @PostMapping("/exam/success/{id}")
+    public ResponseEntity submitExam(@PathVariable UUID id,@RequestBody Map<UUID,Integer> results) throws Exception {
+        Message message;
+        try {
+            return ResponseEntity.ok(competitionService.submitExam(id,results));
+        } catch (NullPointerException e) {
+            message = new Message(
+                    "COMPETITION_NOT_EXIST",
+                    CompetitionMessage.COMPETITION_NOT_EXIST.value(),
+                    400);
+        } catch (Exception e) {
+
+            message = new Message(
+                    "SERVER_ERROR",
+                    CommonMessage.SERVER_ERROR.value(),
+                    500);
+        }
+        return new ResponseEntity<Object>(
+                message, new HttpHeaders(), message.getStatus());
+    }
+
+    @GetMapping("/exam/student/{id}")
+    public ResponseEntity getStudents(@PathVariable UUID id) throws Exception {
+        Message message;
+        try {
+            return ResponseEntity.ok(competitionService.getStudents(id));
+        } catch (NullPointerException e) {
+            message = new Message(
+                    "COMPETITION_NOT_EXIST",
+                    CompetitionMessage.COMPETITION_NOT_EXIST.value(),
+                    400);
+        } catch (Exception e) {
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),

@@ -120,7 +120,7 @@ public class CompetitionService implements ICompetitionService {
             );
         }
         List<UUID> ids = page.getContent().stream().map(item -> item.getId()).toList();
-        Map<UUID, Integer> degrees = studentExamRepository.getDegree(ids);
+        List<Object[]> degrees = studentExamRepository.getDegree(ids);
         List<Competition> competitions = competitionMapper.getList(page.getContent(), degrees);
         PageModal<Competition> result = new PageModal<>(page, competitions);
         return result;
@@ -201,6 +201,52 @@ public class CompetitionService implements ICompetitionService {
     }
 
     @Override
+    public double submitExam(UUID id, Map<UUID, Integer> results) {
+
+        StudentExamEntity studentExamEntity = studentExamRepository.findById(id);
+        final Integer[] count = {0};
+        final Integer[] countCorrect = {0};
+        studentExamEntity.getExam().getQuestionLv1().stream().forEach(item -> {
+            count[0]++;
+            if (item.getCorrectAnswer() == results.get(item.getId())) {
+                countCorrect[0]++;
+            }
+        });
+        studentExamEntity.getExam().getQuestionLv2().stream().forEach(item -> {
+            count[0]++;
+            if (item.getCorrectAnswer() == results.get(item.getId())) {
+                countCorrect[0]++;
+            }
+        });
+        studentExamEntity.getExam().getQuestionLv3().stream().forEach(item -> {
+            count[0]++;
+            if (item.getCorrectAnswer() == results.get(item.getId())) {
+                countCorrect[0]++;
+            }
+        });
+        studentExamEntity.getExam().getQuestionLv4().stream().forEach(item -> {
+            count[0]++;
+            if (item.getCorrectAnswer() == results.get(item.getId())) {
+                countCorrect[0]++;
+            }
+        });
+        double result = (double) countCorrect[0] * 10 / count[0];
+        studentExamEntity.setStatus(1);
+        studentExamEntity.setAnswers(results);
+        studentExamEntity.setDegree((double) Math.round(result * 100) / 100);
+        studentExamRepository.save(studentExamEntity);
+        return studentExamEntity.getDegree();
+    }
+
+    @Override
+    public   List<StudentExam>  getStudents(UUID id) {
+
+            List<StudentExam> studentExams= competitionMapper.getListStudent(studentExamRepository.getStudents(id));
+
+        return studentExams;
+    }
+
+    @Override
     public List<ExamEntity> getExams(UUID id) {
         return examRepository.findByCompetitionId(id);
     }
@@ -209,25 +255,25 @@ public class CompetitionService implements ICompetitionService {
     public StudentExamEntity getExamByStudent(UUID id) {
         StudentExamEntity studentExamEntity = studentExamRepository.getByStudentUserUsernameAndExamCompetitionId(SecurityContextHolder.getContext().getAuthentication().getName(), id);
         try {
+            if(studentExamEntity.getExam().getCompetition().getStatus()!=2){
             studentExamEntity.getExam().setQuestionLv1(studentExamEntity.getExam().getQuestionLv1().stream().map(item -> {
                 item.setCorrectAnswer(null);
                 return item;
             }).toList());
-            studentExamEntity.getExam().setQuestionLv2(   studentExamEntity.getExam().getQuestionLv2().stream().map(item -> {
+            studentExamEntity.getExam().setQuestionLv2(studentExamEntity.getExam().getQuestionLv2().stream().map(item -> {
                 item.setCorrectAnswer(null);
                 return item;
             }).toList());
-            studentExamEntity.getExam().setQuestionLv3(     studentExamEntity.getExam().getQuestionLv3().stream().map(item -> {
+            studentExamEntity.getExam().setQuestionLv3(studentExamEntity.getExam().getQuestionLv3().stream().map(item -> {
                 item.setCorrectAnswer(null);
                 return item;
             }).toList());
-            studentExamEntity.getExam().setQuestionLv4(     studentExamEntity.getExam().getQuestionLv4().stream().map(item -> {
+            studentExamEntity.getExam().setQuestionLv4(studentExamEntity.getExam().getQuestionLv4().stream().map(item -> {
                 item.setCorrectAnswer(null);
                 return item;
-            }).toList());
+            }).toList());}
             return studentExamEntity;
         } catch (Exception e) {
-            System.out.println(e);
             return null;
         }
     }
@@ -237,6 +283,7 @@ public class CompetitionService implements ICompetitionService {
         ExamEntity exam = examRepository.findById(commonService.convertBytesToUUID(examRepository.getRandomId(id)));
         StudentExamEntity studentExamEntity = new StudentExamEntity();
         studentExamEntity.setExam(exam);
+        studentExamEntity.setDegree(0);
         studentExamEntity.setStudent(studentRepository.findByUserUsernameAndDeleteAtIsNull(SecurityContextHolder.getContext().getAuthentication().getName()));
         studentExamEntity.setStatus(0);
         studentExamEntity.setStartAt(new Date());
@@ -300,10 +347,10 @@ public class CompetitionService implements ICompetitionService {
         List<Integer> range = IntStream.rangeClosed(1, qty)
                 .boxed().collect(Collectors.toList());
         Collections.shuffle(range);
-        List<Integer> randomSeries = range.subList(0, length + 1);
+        List<Integer> randomSeries = range.subList(0, length);
         List<QuestionIndelibilityEntity> questionIndelibilityEntities = new ArrayList<>();
         randomSeries.forEach(item -> {
-            Page<QuestionEntity> questionPage = questionRepository.findAllByLevelAndDeleteAtIsNull(level, PageRequest.of(item, 1));
+            Page<QuestionEntity> questionPage = questionRepository.findAllByLevelAndDeleteAtIsNull(level, PageRequest.of(item-1, 1));
             QuestionEntity q = null;
             if (questionPage.hasContent()) {
                 q = questionPage.getContent().get(0);

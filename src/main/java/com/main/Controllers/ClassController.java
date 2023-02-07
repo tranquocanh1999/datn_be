@@ -48,7 +48,6 @@ public class ClassController {
                     ClassMessage.CLASS_NOT_EXIST.value(),
                     400);
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
