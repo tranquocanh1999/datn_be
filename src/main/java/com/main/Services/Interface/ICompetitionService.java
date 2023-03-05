@@ -19,7 +19,7 @@ public interface ICompetitionService {
 
     double submitExam(UUID id, Map<UUID,Integer> results) ;
     List<StudentExam>  getStudents(UUID id);
-
+    List<DegreeGraph>  getDataGraph(UUID id);
 
     CompetitionEntity changeStatus(UUID id, Integer status) throws CommonException;
     StudentExamEntity startExam(UUID id);

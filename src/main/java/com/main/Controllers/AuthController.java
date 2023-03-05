@@ -65,7 +65,6 @@ public class AuthController {
     public ResponseEntity getToken(@RequestParam String refreshToken) {
         try {
             Token token = authService.GetToken(refreshToken);
-            System.out.println(1);
             return ResponseEntity.ok(token);
         } catch (CommonException e) {
             Message message = e.getData();

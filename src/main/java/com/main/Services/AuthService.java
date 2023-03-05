@@ -36,6 +36,7 @@ public class AuthService implements IAuthService {
     private StudentRepository studentRepository;
 
 
+
     public Token Login(String username, String password) {
 
         UserEntity user = userRepository.findByUsernameAndPasswordAndDeleteAtIsNull(username, commonService.encryptPass(password));

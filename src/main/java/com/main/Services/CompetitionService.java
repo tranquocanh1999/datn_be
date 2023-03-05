@@ -36,6 +36,9 @@ public class CompetitionService implements ICompetitionService {
     @Autowired
     StudentExamRepository studentExamRepository;
     @Autowired
+    AnswerRepository answerRepository;
+
+    @Autowired
     QuestionRepository questionRepository;
     @Autowired
     StudentRepository studentRepository;
@@ -147,6 +150,7 @@ public class CompetitionService implements ICompetitionService {
         CompetitionEntity result = competitionRepository.findByIdAndDeleteAtIsNull(id);
         if (result.getStatus() != 2) {
             result.setStatus(status);
+            result.setUpdateAt(new Date());
             competitionRepository.save(result);
             return null;
         } else {
@@ -206,44 +210,72 @@ public class CompetitionService implements ICompetitionService {
         StudentExamEntity studentExamEntity = studentExamRepository.findById(id);
         final Integer[] count = {0};
         final Integer[] countCorrect = {0};
+        List<AnswerEntity> answerEntities = new ArrayList<>();
         studentExamEntity.getExam().getQuestionLv1().stream().forEach(item -> {
             count[0]++;
-            if (item.getCorrectAnswer() == results.get(item.getId())) {
+            Boolean flag = false;
+            Integer answer = results.get(item.getId());
+            if (item.getCorrectAnswer() == answer) {
                 countCorrect[0]++;
+                flag = true;
             }
+            answerEntities.add(new AnswerEntity(item.getId(), answer, flag, studentExamEntity));
         });
         studentExamEntity.getExam().getQuestionLv2().stream().forEach(item -> {
             count[0]++;
-            if (item.getCorrectAnswer() == results.get(item.getId())) {
+            Boolean flag = false;
+            Integer answer = results.get(item.getId());
+            if (item.getCorrectAnswer() == answer) {
                 countCorrect[0]++;
+                flag = true;
             }
+            answerEntities.add(new AnswerEntity(item.getId(), answer, flag, studentExamEntity));
         });
         studentExamEntity.getExam().getQuestionLv3().stream().forEach(item -> {
             count[0]++;
-            if (item.getCorrectAnswer() == results.get(item.getId())) {
+            Boolean flag = false;
+            Integer answer = results.get(item.getId());
+            if (item.getCorrectAnswer() == answer) {
                 countCorrect[0]++;
+                flag = true;
             }
+            answerEntities.add(new AnswerEntity(item.getId(), answer, flag, studentExamEntity));
         });
         studentExamEntity.getExam().getQuestionLv4().stream().forEach(item -> {
             count[0]++;
-            if (item.getCorrectAnswer() == results.get(item.getId())) {
+            Boolean flag = false;
+            Integer answer = results.get(item.getId());
+            if (item.getCorrectAnswer() == answer) {
                 countCorrect[0]++;
+                flag = true;
             }
+            answerEntities.add(new AnswerEntity(item.getId(), answer, flag, studentExamEntity));
         });
         double result = (double) countCorrect[0] * 10 / count[0];
         studentExamEntity.setStatus(1);
-        studentExamEntity.setAnswers(results);
+        studentExamEntity.setEndAt(new Date());
         studentExamEntity.setDegree((double) Math.round(result * 100) / 100);
         studentExamRepository.save(studentExamEntity);
+        answerEntities.forEach(item -> {
+            answerRepository.save(item);
+        });
         return studentExamEntity.getDegree();
     }
 
     @Override
-    public   List<StudentExam>  getStudents(UUID id) {
-
-            List<StudentExam> studentExams= competitionMapper.getListStudent(studentExamRepository.getStudents(id));
-
+    public List<StudentExam> getStudents(UUID id) {
+        List<StudentExam> studentExams = competitionMapper.getListStudent(studentExamRepository.getStudents(id));
+        studentExams=    studentExams.stream().map(item -> {
+            item.setAnswers(answerRepository.findAllByExamId(item.getExamID()));
+            return item;
+        }).toList();
         return studentExams;
+    }
+
+    @Override
+    public List<DegreeGraph> getDataGraph(UUID id) {
+        List<DegreeGraph> degreeGraphs = competitionMapper.getDataDegree(studentExamRepository.getDegree(id));
+        return degreeGraphs;
     }
 
     @Override
@@ -255,23 +287,24 @@ public class CompetitionService implements ICompetitionService {
     public StudentExamEntity getExamByStudent(UUID id) {
         StudentExamEntity studentExamEntity = studentExamRepository.getByStudentUserUsernameAndExamCompetitionId(SecurityContextHolder.getContext().getAuthentication().getName(), id);
         try {
-            if(studentExamEntity.getExam().getCompetition().getStatus()!=2){
-            studentExamEntity.getExam().setQuestionLv1(studentExamEntity.getExam().getQuestionLv1().stream().map(item -> {
-                item.setCorrectAnswer(null);
-                return item;
-            }).toList());
-            studentExamEntity.getExam().setQuestionLv2(studentExamEntity.getExam().getQuestionLv2().stream().map(item -> {
-                item.setCorrectAnswer(null);
-                return item;
-            }).toList());
-            studentExamEntity.getExam().setQuestionLv3(studentExamEntity.getExam().getQuestionLv3().stream().map(item -> {
-                item.setCorrectAnswer(null);
-                return item;
-            }).toList());
-            studentExamEntity.getExam().setQuestionLv4(studentExamEntity.getExam().getQuestionLv4().stream().map(item -> {
-                item.setCorrectAnswer(null);
-                return item;
-            }).toList());}
+            if (studentExamEntity.getExam().getCompetition().getStatus() != 2) {
+                studentExamEntity.getExam().setQuestionLv1(studentExamEntity.getExam().getQuestionLv1().stream().map(item -> {
+                    item.setCorrectAnswer(null);
+                    return item;
+                }).toList());
+                studentExamEntity.getExam().setQuestionLv2(studentExamEntity.getExam().getQuestionLv2().stream().map(item -> {
+                    item.setCorrectAnswer(null);
+                    return item;
+                }).toList());
+                studentExamEntity.getExam().setQuestionLv3(studentExamEntity.getExam().getQuestionLv3().stream().map(item -> {
+                    item.setCorrectAnswer(null);
+                    return item;
+                }).toList());
+                studentExamEntity.getExam().setQuestionLv4(studentExamEntity.getExam().getQuestionLv4().stream().map(item -> {
+                    item.setCorrectAnswer(null);
+                    return item;
+                }).toList());
+            }
             return studentExamEntity;
         } catch (Exception e) {
             return null;
@@ -350,18 +383,19 @@ public class CompetitionService implements ICompetitionService {
         List<Integer> randomSeries = range.subList(0, length);
         List<QuestionIndelibilityEntity> questionIndelibilityEntities = new ArrayList<>();
         randomSeries.forEach(item -> {
-            Page<QuestionEntity> questionPage = questionRepository.findAllByLevelAndDeleteAtIsNull(level, PageRequest.of(item-1, 1));
-            QuestionEntity q = null;
+            Page<QuestionEntity> questionPage = questionRepository.findAllByLevelAndDeleteAtIsNull(level, PageRequest.of(item - 1, 1));
+            try {
+                System.out.println(commonService.convertObjectToJson(questionPage));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
             if (questionPage.hasContent()) {
-                q = questionPage.getContent().get(0);
+                QuestionEntity q = questionPage.getContent().get(0);
                 questionIndelibilityEntities.add(new QuestionIndelibilityEntity(q));
             }
         });
-        try {
-            System.out.println(commonService.convertObjectToJson(questionIndelibilityEntities));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+
         return questionIndelibilityRepository.saveAll(questionIndelibilityEntities);
     }
 }

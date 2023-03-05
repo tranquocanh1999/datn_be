@@ -17,16 +17,21 @@ public interface StudentExamRepository extends JpaRepository<StudentExamEntity, 
 
     StudentExamEntity findById(UUID id);
 
-    @Query(value = "select t1.id,t1.full_name,t2.degree, t2.status from \n" +
-            "(select distinct  BIN_TO_UUID(s.id) as id , u.full_name,u.username, BIN_TO_UUID(cl.class_id) as class_id, BIN_TO_UUID(co.class_id) as competition_id\n" +
-            "from datn_db.user u,  student s, student_class cl ,competition co\n" +
-            "where s.id=cl.student_id\n" +
-            " and u.id=s.user_id \n" +
-            "  and co.class_id=cl.class_id \n" +
-            " and co.id=(:id)\n" +
-            " ) as t1 left join (select distinct BIN_TO_UUID(se.student_id) as student_id, se.degree,se.status,e.code\n" +
-            "from student_exam se, competition co, exam e\n" +
-            "where se.exam_id=e.id) as t2 on t2.student_id=t1.id\n" +
-            " ", nativeQuery = true)
+    @Query(value = "select t1.id,t1.full_name,t2.degree, t2.status ,t2.exam_id, t2.start_at,t2.end_at from \n" +
+            "                                   (select distinct  BIN_TO_UUID(s.id) as id , u.full_name,u.username, BIN_TO_UUID(cl.class_id) as class_id, BIN_TO_UUID(co.class_id) as competition_id\n" +
+            "                                   from datn_db.user u,  student s, student_class cl ,competition co\n" +
+            "                                   where s.id=cl.student_id\n" +
+            "                                    and u.id=s.user_id \n" +
+            "                                     and co.class_id=cl.class_id \n" +
+            "                                    and co.id=(:id)\n" +
+            "                                    ) as t1 left join (select distinct BIN_TO_UUID(co.id) as id,BIN_TO_UUID(se.id) as exam_id,BIN_TO_UUID(se.student_id) as student_id, se.degree,se.status,e.code, se.start_at,se.end_at\n" +
+            "                                   from student_exam se, competition co, exam e\n" +
+            "                                   where se.exam_id=e.id and e.competition_id=co.id and co.id=(:id)) as t2 on t2.student_id=t1.id  ", nativeQuery = true)
     List<List<String>> getStudents(UUID id);
+
+    @Query(value = "select distinct se.degree, count(*) as total\n" +
+            "\tfrom student_exam se,  exam e\n" +
+            "\twhere se.exam_id=e.id and e.competition_id=(:id)\n" +
+            "    group by se.degree  order by se.degree asc", nativeQuery = true)
+    List<List<String>> getDegree(UUID id);
 }

@@ -29,7 +29,6 @@ public class StudentExamController {
         try {
             return ResponseEntity.ok(competitionService.findManyByClass(data));
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -87,7 +86,6 @@ public class StudentExamController {
                     CompetitionMessage.COMPETITION_NOT_EXIST.value(),
                     400);
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -108,7 +106,6 @@ public class StudentExamController {
                     CompetitionMessage.COMPETITION_NOT_EXIST.value(),
                     400);
         } catch (Exception e) {
-
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -123,6 +120,26 @@ public class StudentExamController {
         Message message;
         try {
             return ResponseEntity.ok(competitionService.getStudents(id));
+        } catch (NullPointerException e) {
+            message = new Message(
+                    "COMPETITION_NOT_EXIST",
+                    CompetitionMessage.COMPETITION_NOT_EXIST.value(),
+                    400);
+        } catch (Exception e) {
+            message = new Message(
+                    "SERVER_ERROR",
+                    CommonMessage.SERVER_ERROR.value(),
+                    500);
+        }
+        return new ResponseEntity<Object>(
+                message, new HttpHeaders(), message.getStatus());
+    }
+
+    @GetMapping("/exam/degree-graph/{id}")
+    public ResponseEntity getDataGraph(@PathVariable UUID id) throws Exception {
+        Message message;
+        try {
+            return ResponseEntity.ok(competitionService.getDataGraph(id));
         } catch (NullPointerException e) {
             message = new Message(
                     "COMPETITION_NOT_EXIST",

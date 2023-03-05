@@ -31,7 +31,6 @@ public class StudentController {
         try {
             return ResponseEntity.ok(studentService.findMany(data));
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -94,7 +93,6 @@ public class StudentController {
         } catch (CommonException e) {
             message = e.getData();
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),
@@ -118,7 +116,6 @@ public class StudentController {
                     StudentMessage.STUDENT_NOT_EXIST.value(),
                     400);
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),

@@ -3,6 +3,7 @@ package com.main.Shared.Mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.main.Entities.CompetitionEntity;
 import com.main.Models.Competition;
+import com.main.Models.DegreeGraph;
 import com.main.Models.StudentExam;
 import com.main.Shared.Services.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,13 @@ public class CompetitionMapper {
             studentExams.add(new StudentExam(item));
         });
         return studentExams;
+    }
+
+    public List<DegreeGraph> getDataDegree(List<List<String>> degrees) {
+        List<DegreeGraph> degreeGraphs = new ArrayList<>();
+        degrees.forEach(item -> {
+            degreeGraphs.add(new DegreeGraph(item));
+        });
+        return degreeGraphs;
     }
 }

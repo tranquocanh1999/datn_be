@@ -212,7 +212,6 @@ public class StudentService implements IStudentService {
             message.setMgsCode("USERNAME_IS_USED");
             message.setMessage(StudentMessage.USERNAME_IS_USED.value());
         }
-        System.out.println(message.getMessage() == null);
         if (message.getMessage() == null) {
             return null;
         } else return message;

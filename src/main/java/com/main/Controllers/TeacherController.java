@@ -87,7 +87,6 @@ public class TeacherController {
         } catch (CommonException e) {
             message = e.getData();
         } catch (Exception e) {
-            System.out.println(e);
             message = new Message(
                     "SERVER_ERROR",
                     CommonMessage.SERVER_ERROR.value(),

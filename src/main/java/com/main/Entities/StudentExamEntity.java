@@ -3,6 +3,7 @@ package com.main.Entities;
 import com.main.Models.ExamForm;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.Where;
 
 import java.util.*;
 
@@ -38,11 +39,11 @@ public class StudentExamEntity {
     @Column
     private Date startAt;
 
-    @ElementCollection
-    @CollectionTable(name="student_answer")
-    @MapKeyJoinColumn(name="student_answer_id")
-    @Column(name = "student_answers")
-    private Map<UUID, Integer> answers = new HashMap<>();
+    @Column
+    private Date endAt;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "exam", cascade = CascadeType.ALL)
+    private List<AnswerEntity> answers = new ArrayList<>();
 
     @Column
     private UUID createBy;
@@ -119,11 +120,11 @@ public class StudentExamEntity {
         this.startAt = startAt;
     }
 
-    public Map<UUID, Integer> getAnswers() {
+    public List<AnswerEntity> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(Map<UUID, Integer> answers) {
+    public void setAnswers(List<AnswerEntity> answers) {
         this.answers = answers;
     }
 
@@ -135,5 +136,12 @@ public class StudentExamEntity {
         this.createBy = createBy;
     }
 
-    //endregion
+    public Date getEndAt() {
+        return endAt;
+    }
+
+    public void setEndAt(Date endAt) {
+        this.endAt = endAt;
+    }
+//endregion
 }
