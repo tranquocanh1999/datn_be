@@ -24,7 +24,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Long> 
     QuestionEntity findByIdAndDeleteAtIsNull(UUID id);
 
     Integer countAllByLevelAndDeleteAtIsNull(Integer Level);
-    @Query(value = "SELECT code FROM datn_db.question order by create_at desc limit 0,1", nativeQuery = true)
+    @Query(value = "SELECT code FROM giáo viênquestion order by create_at desc limit 0,1", nativeQuery = true)
     String getQuestionCode();
 
 }

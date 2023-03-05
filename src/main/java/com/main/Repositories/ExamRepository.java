@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface ExamRepository extends JpaRepository<ExamEntity, Long> {
     List<ExamEntity> findByCompetitionId(UUID id);
 
-    @Query(value = "SELECT e.id FROM datn_db.exam e left join datn_db.competition c ON e.competition_id = c.id  where c.id= :id order by RAND() limit 0,1", nativeQuery = true)
+    @Query(value = "SELECT e.id FROM giáo viênexam e left join giáo viêncompetition c ON e.competition_id = c.id  where c.id= :id order by RAND() limit 0,1", nativeQuery = true)
     byte[] getRandomId(UUID id);
     ExamEntity findById(UUID id);
 }

@@ -18,7 +18,7 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
 
     ClassEntity findByIdAndDeleteAtIsNull(UUID id);
 
-    @Query(value = "SELECT class_code FROM datn_db.class order by create_at desc limit 0,1", nativeQuery = true)
+    @Query(value = "SELECT class_code FROM giáo viênclass order by create_at desc limit 0,1", nativeQuery = true)
     String getClassCode();
 
 
